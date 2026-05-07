@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Form - 2026 XXX Consulting All-Developer YYY ZZZ-a-thon</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header-bar">
+                <h1>📊 2026 XXX Consulting All-Developer YYY ZZZ-a-thon</h1>
+                <div class="header-actions">
+                    <a href="status.html" class="btn btn-small">View My Requests</a>
+                    <button class="btn btn-outline" onclick="logout()">Logout</button>
+                </div>
+            </div>
+            <h2>Request for access to deployment environment for the pro-code solution Pattern Option B</h2>
+            <hr>
+
+            <form id="requestForm">
+                <div class="form-group">
+                    <label for="teamName">Team Name <span class="required">*</span></label>
+                    <input type="text" id="teamName" placeholder="Enter your team name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="teamEmail">Team Leader Email ID <span class="required">*</span></label>
+                    <input type="email" id="teamEmail" placeholder="Enter team leader email" required>
+                    <small class="hint">⚠️ Ensure same team name and email id given during registration</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Brief Description of the Solution <span class="required">*</span></label>
+                    <textarea id="description" rows="4" placeholder="Provide a brief description of your solution..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="justification">Justification for Needing Deployment Environment <span class="required">*</span></label>
+                    <textarea id="justification" rows="5" placeholder="Explain why you need the deployment environment and how you will use it..." required></textarea>
+                    <small class="hint">Please mention how you will use the environment</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        // Check if user is logged in
+        var currentUser = checkAuth();
+        showConnectCSVBar();
+
+        // Pre-fill email
+        if (currentUser) {
+            document.getElementById('teamEmail').value = currentUser.email;
+        }
+
+        document.getElementById('requestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var teamName = document.getElementById('teamName').value.trim();
+            var email = document.getElementById('teamEmail').value.trim();
+            var description = document.getElementById('description').value.trim();
+            var justification = document.getElementById('justification').value.trim();
+
+            if (!teamName || !email || !description || !justification) {
+                showMessage('All fields are required', 'error');
+                return;
+            }
+
+            var requests = getRequests();
+            var newRequest = {
+                id: Date.now().toString(),
+                teamName: teamName,
+                email: email,
+                description: description,
+                justification: justification,
+                status: 'Pending',
+                adminComments: '',
+                submittedDate: new Date().toISOString().split('T')[0]
+            };
+            requests.push(newRequest);
+            saveRequests(requests);
+
+            showMessage('Request submitted successfully!', 'success');
+            document.getElementById('requestForm').reset();
+            if (currentUser) {
+                document.getElementById('teamEmail').value = currentUser.email;
+            }
+        });
+
+        function showMessage(text, type) {
+            var msgDiv = document.getElementById('message');
+            msgDiv.textContent = text;
+            msgDiv.className = 'message ' + type;
+            setTimeout(function() { msgDiv.textContent = ''; msgDiv.className = 'message'; }, 3000);
+        }
+    </script>
+</body>
+</html>
